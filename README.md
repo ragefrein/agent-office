@@ -1,41 +1,46 @@
 # Hermes Agent Office
 
-Kantor AI agent 3D berbasis React, Three.js, dan Vite. Ruang dibuat dari geometri lokal tanpa ketergantungan model eksternal.
+Kantor AI agent 3D berbasis React, Three.js, dan Vite, dengan backend Node.js untuk Hermes Agent di AWS.
 
-## Menjalankan
+## Menjalankan web
 
 ```sh
-npm install
+npm ci
 npm run dev
 ```
 
-Buka alamat yang ditampilkan Vite. Build produksi: `npm run build`. Preview build: `npm run preview`.
+Build produksi: `npm run build`. Output: `dist/`. Deploy frontend ke Vercel atau Cloudflare Pages dengan custom domain `rage.ai.id`.
 
-## Fitur
+## Menghubungkan Hermes
 
-- Studio 3D interaktif: putar, zoom, reset kamera, layar penuh, fokus ruangan.
-- Enam agent contoh dengan detail, pemberian tugas, dan penyelesaian tugas demo.
-- Pencarian tim dan riwayat aktivitas selama sesi.
-- Pengaturan endpoint gateway disimpan di localStorage setelah health check berhasil.
-- Layout responsif dan panel pengelolaan yang tetap bisa dipakai tanpa WebGL.
+**[Panduan instalasi langsung AWS → deploy/AWS.md](deploy/AWS.md)**
 
-## Integrasi Hermes di AWS
+Frontend `https://rage.ai.id` → backend `https://api.rage.ai.id` → Hermes `http://127.0.0.1:8642` pada server AWS yang sama.
 
-**Mode saat ini adalah demo. Tidak ada agent AWS yang sudah tersambung.** Tugas demo berada dalam state browser dan hilang saat halaman dimuat ulang. Statistik 24 tugas dan tren 12% adalah contoh, bukan telemetri riil.
+1. Pastikan API Hermes hidup dan API_SERVER_KEY sudah dikonfigurasi.
+2. Instal backend sebagai layanan systemd menggunakan template di `deploy/`.
+3. Isi `/etc/hermes-office.env` dengan token Hermes dan password kantor. Contoh tanpa secret: `server/.env.example`.
+4. Hubungkan DNS, reverse proxy Nginx, dan sertifikat HTTPS untuk `api.rage.ai.id`.
+5. Buka Settings di kantor → masukkan URL backend dan password kantor → **Masuk & hubungkan**.
 
-Panel koneksi memanggil `GET {gatewayUrl}/health`, timeout 10 detik, dan mengharapkan JSON `{"status":"ok"}` atau `{"status":"healthy"}`. Pemeriksaan berhasil hanya menunjukkan gateway sehat; belum menyinkronkan agent atau mengirim tugas.
+Token API Hermes tidak dikirim ke browser. Sesi login memakai cookie HttpOnly/Secure selama 12 jam. Nilai `VITE_OFFICE_API_URL=https://api.rage.ai.id` pada hosting hanya memilih URL default; tidak boleh memuat token. Password kantor dikirim hanya ke backend yang Anda pilih untuk login, dan tidak disimpan di localStorage.
 
-Untuk menghubungkan Hermes yang ada, sediakan adapter backend pada instance AWS yang mengakses runtime Hermes Anda. Kontrak yang disarankan untuk tahap integrasi berikutnya:
+Tanpa koneksi backend, tersedia mode demo yang ditandai jelas. Enam robot merupakan enam persona/peran yang menggunakan satu runtime Hermes; bukan enam instalasi Hermes. Kantor mengirim tugas tanpa riwayat chat sebelumnya. State backend dibaca setiap 5 detik; streaming progres tool belum tersedia.
 
-```text
-GET  /health           -> { "status": "ok" }
-GET  /agents           -> { "agents": [{ "id": "atlas", "name": "Atlas", "role": "Lead orchestrator", "status": "working", "task": "..." }] }
-POST /agents/:id/tasks -> { "taskId": "...", "status": "queued" }
-GET  /events           -> Server-Sent Events untuk perubahan status/tugas
+## Tugas dan penyimpanan
+
+- API kantor menerima tugas, menyimpannya di SQLite, lalu memanggil API chat Hermes secara berurutan.
+- Tugas yang sudah diterima tetap berjalan setelah browser ditutup.
+- Hasil dan status tersimpan setelah refresh/restart. UI menampilkan hasil melalui detail agent dan tab aktivitas.
+- Antrean dilanjutkan setelah restart backend. Tugas yang sedang berjalan saat proses terputus ditandai `interrupted` dan tidak dikirim ulang otomatis: Hermes mungkin sudah melakukan tindakan. Periksa hasil sebelum mengulang.
+- Health check berhasil hanya membuktikan liveness; uji satu tugas nyata untuk memverifikasi token/model.
+- Deploy backend pada satu proses Node **22.13+** dengan penyimpanan permanen; disarankan Node 24. Jangan deploy worker antrean ini sebagai frontend statis atau fungsi per-request.
+
+## Pengujian
+
+```sh
+npm run test:server
+npm run build
 ```
 
-Endpoint selain `/health` belum dipanggil frontend. Kontrak ini usulan adapter, bukan asumsi bahwa Hermes menyediakan API tersebut. Implementasi aktual harus disesuaikan dengan versi dan antarmuka Hermes di AWS Anda.
-
-Gunakan HTTPS, autentikasi sesi pada backend, dan CORS terbatas ke origin frontend. Simpan kredensial AWS/API hanya di backend. Jangan taruh secret di variabel Vite atau localStorage. Frontend tidak meminta atau menyimpan secret.
-
-Untuk deploy, unggah direktori `dist/` ke hosting statis seperti S3/CloudFront atau sajikan menggunakan Nginx. Koneksi ke gateway memerlukan URL dan adapter yang tersedia dari browser pengguna.
+Tes backend memakai Hermes tiruan, tanpa mengakses AWS. File rahasia `.env`, database `data/`, dan private key dikecualikan dari Git. `.env.example` hanya berisi contoh dan boleh di-commit.

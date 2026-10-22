@@ -1,1 +1,27 @@
-{"name":"hermes-agent-office","version":"1.0.0","private":true,"type":"module","scripts":{"dev":"vite --host 0.0.0.0","build":"vite build","preview":"vite preview --host 0.0.0.0"},"dependencies":{"@vitejs/plugin-react":"latest","vite":"latest","typescript":"latest","react":"latest","react-dom":"latest","three":"latest","lucide-react":"latest"},"devDependencies":{}}
+{
+  "name": "hermes-agent-office",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "server": "node --env-file=server/.env server/index.mjs",
+    "server:start": "node server/index.mjs",
+    "test:server": "node --test server/server.test.mjs"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "vite": "latest",
+    "typescript": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "three": "latest",
+    "lucide-react": "latest"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=22.13.0"
+  }
+}

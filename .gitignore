@@ -3,3 +3,11 @@ dist/
 .env
 .env.*
 *.log
+!.env.example
+data/
+deploy/
+*.sqlite
+*.sqlite-*
+*.pem
+*.key
+.aws/
