@@ -8,6 +8,12 @@ export const defaultAgents = [
 ];
 
 export const defaultSettings = { name: 'Rage AI Studio', focus: 'Bantu pemilik meriset, membangun, menulis, dan meninjau pekerjaan sampai hasilnya dapat dipakai.', language: 'id', paused: false, theme: 'sunshine', motion: true };
+export const skillCatalog = {
+ atlas: ['planning', 'delegation', 'final-report'], nova: ['research', 'fact-checking', 'source-analysis'],
+ pixel: ['coding', 'debugging', 'testing'], quill: ['copywriting', 'documentation', 'content'],
+ sage: ['quality-review', 'data-analysis', 'risk-review'], echo: ['summarization', 'support', 'delivery'],
+};
+export const enrichAgent = a => ({ ...a, skills: a.skills || skillCatalog[a.id] || ['general-support'], nativeSkills:a.nativeSkills||[],permissions: a.permissions || [], specialty: a.specialty || a.role });
 export const workflowPresets = [
   { id: 'all', name: 'Dream team', description: 'Dari brief sampai hasil akhir, bersama seluruh tim.', agents: ['atlas', 'nova', 'pixel', 'quill', 'sage', 'echo'] },
   { id: 'research', name: 'Research sprint', description: 'Riset, analisis, dan ringkasan yang siap dipakai.', agents: ['atlas', 'nova', 'sage', 'echo'] },

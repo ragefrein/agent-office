@@ -35,7 +35,7 @@ export default function useGateway() {
   useEffect(() => {
     if (!live) return;
     let stopped = false, timer;
-    async function tick() { await refresh(); if (!stopped) timer = setTimeout(tick, 5000); }
+    async function tick() { await refresh(); if (!stopped) timer = setTimeout(tick, 2000); }
     tick();
     return () => { stopped = true; clearTimeout(timer); generation.current++; };
   }, [refresh, live]);
@@ -81,5 +81,16 @@ export default function useGateway() {
     const data = await api(url, '/workflows', { method: 'POST', body: JSON.stringify({ ...mission, requestId: request.current.id }) });
     request.current = null; await refresh(); return data;
   }
-  return { url, live, authenticated, snapshot, error, connect, submit, disconnect, refresh, saveSettings, launchMission };
+  async function launchLead(brief){
+    if(!authenticated||error)throw new Error(error||'Masuk ke backend terlebih dahulu.');
+    const signature=JSON.stringify(brief);
+    if(request.current?.signature!==signature)request.current={signature,id:crypto.randomUUID()};
+    const data=await api(url,'/lead',{method:'POST',body:JSON.stringify({...brief,requestId:request.current.id})});request.current=null;await refresh();return data;
+  }
+  async function accountAction(provider,action){
+    if(!authenticated)throw new Error('Masuk ke backend terlebih dahulu.');
+    const data=await api(url,`/connections/${provider}/${action}`,{method:'POST',body:'{}'});await refresh();return data;
+  }
+  async function readCatalog(){if(!authenticated)throw new Error('Masuk ke backend terlebih dahulu.');return api(url,'/catalog');}
+  return { url, live, authenticated, snapshot, error, connect, submit, disconnect, refresh, saveSettings, launchMission,launchLead,accountAction,readCatalog };
 }

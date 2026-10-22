@@ -4,12 +4,16 @@ Kantor AI agent 3D berbasis React, Three.js, dan Vite, dengan backend Node.js un
 
 ## Tim & kantor ceria
 
+Versi kampus: **[docs/CAMPUS.md](docs/CAMPUS.md)**. Tambahkan hingga 18 bot, definisikan skill, kirim prompt ke team lead untuk perencanaan/delegasi, dan baca laporan final kembali dari lead. Kantor diperluas dengan cabin, pantry, games room, lounge, ruang makan, serta navigasi idle/return-to-desk.
+
+Menu **Akun & akses** memiliki alur OAuth Gmail, Calendar, Notion, GitHub dengan token terenkripsi pada server. Client provider harus dikonfigurasi pemilik; akun belum otomatis terhubung. Adapter awal membaca snapshot terbatas, bukan menulis/mengirim data: **[docs/ACCOUNTS.md](docs/ACCOUNTS.md)**.
+
 - **Atur tim**: nama kantor, tujuan, bahasa, nama bot, instruksi, warna, dan status aktif tersimpan di backend.
 - **Misi tim**: pilih alur, kirim satu brief, dan bot mengerjakan langkah secara berurutan dengan handoff hasil. Langkah berikutnya berhenti bila pendahulunya gagal.
 - **Jeda antrean**: tugas aktif boleh selesai; pekerjaan berikutnya menunggu sampai antrean dilanjutkan.
 - **Suasana**: tema Sunshine, Peach Club, Mint Garden, meja pastel, papan studio, coffee corner, label bot, dan animasi sesuai status.
 
-Panduan pemakaian: **[docs/TEAM.md](docs/TEAM.md)**. Enam peran tetap memakai satu runtime Hermes. Fitur ini tidak menjadwalkan pekerjaan berulang secara otomatis.
+Panduan pemakaian: **[docs/TEAM.md](docs/TEAM.md)**. Peran bot memakai satu runtime Hermes. Fitur ini tidak menjadwalkan pekerjaan berulang secara otomatis.
 
 ## Menjalankan web
 
@@ -34,7 +38,7 @@ Frontend `https://rage.ai.id` → backend `https://api.rage.ai.id` → Hermes `h
 
 Token API Hermes tidak dikirim ke browser. Sesi login memakai cookie HttpOnly/Secure selama 12 jam. Nilai `VITE_OFFICE_API_URL=https://api.rage.ai.id` pada hosting hanya memilih URL default; tidak boleh memuat token. Password kantor dikirim hanya ke backend yang Anda pilih untuk login, dan tidak disimpan di localStorage.
 
-Tanpa koneksi backend, tersedia mode demo yang ditandai jelas. Enam robot merupakan enam persona/peran yang menggunakan satu runtime Hermes; bukan enam instalasi Hermes. Kantor mengirim tugas tanpa riwayat chat sebelumnya. State backend dibaca setiap 5 detik; streaming progres tool belum tersedia.
+Tanpa koneksi backend, tersedia mode demo yang ditandai jelas. Bot merupakan persona/peran pada satu runtime Hermes. Tugas individual tidak membawa riwayat sebelumnya; misi tim meneruskan hasil dan menyusun laporan final. State backend dibaca setiap 2 detik, termasuk cuplikan output/tool publik dari stream Hermes jika tersedia.
 
 ## Tugas dan penyimpanan
 
