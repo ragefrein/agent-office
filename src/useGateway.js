@@ -69,5 +69,17 @@ export default function useGateway() {
     generation.current++; localStorage.removeItem('officeGateway');
     setLive(false); setUrl(''); setAuthenticated(false); setSnapshot(null); setError(''); request.current = null;
   }
-  return { url, live, authenticated, snapshot, error, connect, submit, disconnect, refresh };
+  async function saveSettings(config) {
+    if (!authenticated) throw new Error('Masuk ke kantor terlebih dahulu.');
+    const data = await api(url, '/settings', { method: 'POST', body: JSON.stringify(config) });
+    await refresh(); return data;
+  }
+  async function launchMission(mission) {
+    if (!authenticated || error) throw new Error(error || 'Masuk ke kantor terlebih dahulu.');
+    const signature = JSON.stringify(mission);
+    if (request.current?.signature !== signature) request.current = { signature, id: crypto.randomUUID() };
+    const data = await api(url, '/workflows', { method: 'POST', body: JSON.stringify({ ...mission, requestId: request.current.id }) });
+    request.current = null; await refresh(); return data;
+  }
+  return { url, live, authenticated, snapshot, error, connect, submit, disconnect, refresh, saveSettings, launchMission };
 }

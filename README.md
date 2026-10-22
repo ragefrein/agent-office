@@ -2,6 +2,15 @@
 
 Kantor AI agent 3D berbasis React, Three.js, dan Vite, dengan backend Node.js untuk Hermes Agent di AWS.
 
+## Tim & kantor ceria
+
+- **Atur tim**: nama kantor, tujuan, bahasa, nama bot, instruksi, warna, dan status aktif tersimpan di backend.
+- **Misi tim**: pilih alur, kirim satu brief, dan bot mengerjakan langkah secara berurutan dengan handoff hasil. Langkah berikutnya berhenti bila pendahulunya gagal.
+- **Jeda antrean**: tugas aktif boleh selesai; pekerjaan berikutnya menunggu sampai antrean dilanjutkan.
+- **Suasana**: tema Sunshine, Peach Club, Mint Garden, meja pastel, papan studio, coffee corner, label bot, dan animasi sesuai status.
+
+Panduan pemakaian: **[docs/TEAM.md](docs/TEAM.md)**. Enam peran tetap memakai satu runtime Hermes. Fitur ini tidak menjadwalkan pekerjaan berulang secara otomatis.
+
 ## Menjalankan web
 
 ```sh
